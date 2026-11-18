@@ -1,0 +1,10 @@
+__pycache__/
+*.py[cod]
+.pypirc
+build/
+dist/
+.simv/
+*.egg-info/
+.venv/
+.pytest_cache/
+osm_tiles/

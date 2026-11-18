@@ -1,0 +1,58 @@
+[build-system]
+requires = ["setuptools>=77", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "offlinestreetview"
+dynamic = ["version"]
+description = "Offline street-level image dashboard: synced images, OpenStreetMap tiles, bar chart and image-shift export."
+readme = "README.md"
+requires-python = ">=3.9"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Kuldeep Dixit", email = "dixitkuldeep252@gmail.com" }]
+keywords = ["dash", "plotly", "openstreetmap", "offline", "dashboard", "image", "street-view"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Framework :: Dash",
+  "Intended Audience :: Science/Research",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Scientific/Engineering :: Visualization",
+]
+dependencies = [
+  "dash>=2.11",
+  "plotly<6",
+  "pandas>=1.3",
+  "numpy>=1.20",
+  "Flask>=2.0",
+]
+
+[project.optional-dependencies]
+dev = ["build>=1.0", "twine>=4.0", "pytest>=7.0"]
+
+[project.urls]
+Homepage = "https://github.com/Kuldeep252/offlinestreetview"
+Source   = "https://github.com/Kuldeep252/offlinestreetview"
+Issues   = "https://github.com/Kuldeep252/offlinestreetview/issues"
+
+[project.scripts]
+offlinestreetview       = "offlinestreetview.app:main"
+offlinestreetview-tiles = "offlinestreetview.tiles:cli"
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.dynamic]
+version = { attr = "offlinestreetview.config.__version__" }
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

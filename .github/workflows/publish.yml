@@ -12,7 +12,6 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # 3.9 has no build on ubuntu-latest (now 26.04) -> pin an older image
           - { os: ubuntu-24.04, python-version: "3.9"  }
           - { os: ubuntu-latest, python-version: "3.10" }
           - { os: ubuntu-latest, python-version: "3.11" }
@@ -27,41 +26,40 @@ jobs:
       - run: pytest -q
 
   build:
-  needs: test
-  runs-on: ubuntu-latest
-  steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-python@v5
-      with:
-        python-version: "3.12"
-    - run: python -m pip install --upgrade pip build twine
-    - name: Build distributions
-      run: python -m build
-    - name: Check tag matches built version
-      if: startsWith(github.ref, 'refs/tags/v')
-      run: |
-        tag="${GITHUB_REF_NAME#v}"
-        shopt -s nullglob
-        whl=(dist/offlinestreetview-"$tag"-*.whl)
-        sdist=(dist/offlinestreetview-"$tag".tar.gz)
-        if [ ${#whl[@]} -eq 0 ] && [ ${#sdist[@]} -eq 0 ]; then
-          echo "::error::tag v$tag does not match built version"
-          ls -l dist/
-          exit 1
-        fi
-        echo "tag v$tag matches $(ls dist/)"
-    - run: twine check dist/*
-    - uses: actions/upload-artifact@v4
-      with:
-        name: dist
-        path: dist/
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --upgrade pip build twine
+      - name: Build distributions
+        run: python -m build
+      - name: Check tag matches built version
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          tag="${GITHUB_REF_NAME#v}"
+          shopt -s nullglob
+          whl=(dist/offlinestreetview-"$tag"-*.whl)
+          sdist=(dist/offlinestreetview-"$tag".tar.gz)
+          echo "tag=v$tag  dist=$(ls dist/)"
+          if [ ${#whl[@]} -eq 0 ] && [ ${#sdist[@]} -eq 0 ]; then
+            echo "::error::tag v$tag does not match built version"
+            exit 1
+          fi
+      - run: twine check dist/*
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
 
   publish:
     needs: build
     runs-on: ubuntu-latest
     environment: pypi
     permissions:
-      id-token: write   # required for OIDC trusted publishing
+      id-token: write
     steps:
       - uses: actions/download-artifact@v4
         with:
